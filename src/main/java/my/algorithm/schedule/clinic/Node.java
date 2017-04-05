@@ -16,8 +16,14 @@ public class Node {
 
     private List<Node> children = new ArrayList<>();
 
-    public Node(Service service) {
+    public Node(Service service, int depth) {
         this.service = service;
+        this.depth = depth;
+    }
+
+    public Node(Service nextService) {
+        this.service = nextService;
+        this.depth = 0;
     }
 
     public Node getParent() {
@@ -45,7 +51,6 @@ public class Node {
     }
 
     public void addChild(Node child) {
-
         children.add(child);
     }
 

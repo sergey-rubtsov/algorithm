@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -15,6 +14,8 @@ import java.util.Set;
 public class Process {
 
     private int[] requestedServices;
+
+    List<Branch> forest = new ArrayList<>();
 
     public Process(int[] requestedServices) {
         this.requestedServices = requestedServices;
@@ -48,95 +49,12 @@ public class Process {
     }
 
     private void step(Service begin, Deque<Service> following) {
-        LinkedHashMap<Integer, Service> nodes = new LinkedHashMap<>();
-        nodes.put(begin.getId(), begin);
-        List<LinkedHashMap<Integer, Service>> branches = new ArrayList<>();
-        branches.add(nodes);
+        Branch branch = new Branch(begin, requestedServices);
         while (!following.isEmpty()) {
             Service next = following.pop();
-            tryToExtendBranches(next, branches);
+            branch.tryToExtend(next);
         }
-        int count = 0;
-        for (LinkedHashMap<Integer, Service> branch : branches) {
-            for (Service service : branch.values()) {
-                //System.out.print(service.getId() + "-" + service.getStartTime() + "-" + service.getEndTime() + " ");
-                System.out.print(service.hashCode() + " ");
-                count++;
-            }
-            System.out.println();
-        }
-        System.out.println(count);
+        forest.add(branch);
     }
-
-    private void tryToExtendBranches(Service next, List<LinkedHashMap<Integer, Service>> branches) {
-        List<LinkedHashMap<Integer, Service>> newBranches = new ArrayList<>();
-        for (LinkedHashMap<Integer, Service> branch : branches) {
-            if (!branch.containsKey(next.getId())) {
-                branch.put(next.getId(), next);
-            } else {
-                if (!next.equals(branch.get(next.getId()))) {
-                    LinkedHashMap<Integer, Service> newBranch = new LinkedHashMap<>(branch);
-                    newBranch.put(next.getId(), next);
-                    newBranches.add(newBranch);
-                }
-
-            }
-            //newBranches.addAll(createNewBranches(branch));
-        }
-/*        for (LinkedHashMap<Integer, Service> branch : branches) {
-            branch.put(next.getId(), next);
-        }*/
-        branches.addAll(newBranches);
-    }
-
-    private List<LinkedHashMap<Integer, Service>> createNewBranches(LinkedHashMap<Integer, Service> branch) {
-        List<LinkedHashMap<Integer, Service>> newBranches = new ArrayList<>();
-        List<Service> accumulator = new ArrayList<>();
-        for (Service service : branch.values()) {
-            accumulator.add(service);
-            LinkedHashMap<Integer, Service> newBranch = new LinkedHashMap<>();
-            for (Service newService : accumulator) {
-                newBranch.put(newService.getId(), newService);
-            }
-            newBranches.add(newBranch);
-        }
-        return newBranches;
-    }
-
-    private LinkedHashMap<Integer, Service> clone(LinkedHashMap<Integer, Service> list) {
-        return new LinkedHashMap<Integer, Service>(list);
-    }
-
-    private List<Node> tryToAddNode(Node node, List<Node> nodes) {
-        List<Node> newNodes = new ArrayList<>();
-        for (Node next : nodes) {
-            if (checkPedigree(node, next)) {
-                next.setParent(node);
-                node.addChild(next);
-                newNodes.add(next);
-            }
-        }
-        return newNodes;
-    }
-
-    private boolean checkPedigree(Node parent, Node child) {
-        for (int i = 0; i < requestedServices.length + 1; i++) {
-            if (parent == null) {
-                return true;
-            }
-            if (parent.getService().getId() == child.getService().getId()) {
-                return false;
-            } else {
-                parent = parent.getParent();
-            }
-        }
-        return true;
-    }
-
-    /*        created.add(new Node(begin));
-        while (!services.isEmpty()) {
-            Node newNode = new Node(services.pop());
-            tryToAddNode(newNode, created);
-        }*/
 
 }
