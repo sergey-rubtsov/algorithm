@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) {
         Feeder feeder = new Feeder();
-        RawData data = feeder.readFile("resource/input.txt");
+        RawData data = feeder.readFile("input.txt");
         List<Service> services = data.getServices();
         Process process = new Process(data.getRequestedServices());
         process.start(services);

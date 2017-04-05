@@ -60,15 +60,14 @@ public class Feeder {
     *    0 0 0
     *    * * *
     * */
-    public static RawData readFile(String file) {
-        if (file == null)
-            file = "input.txt";
+    public RawData readFile(String file) {
+        ClassLoader classLoader = getClass().getClassLoader();
         BufferedReader reader = null;
         String line = null;
         RawData rawData = null;
         try {
             reader = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(file)));
+                    new FileInputStream(classLoader.getResource(file).getPath())));
             int numberOfDoctors = Integer.parseInt(reader.readLine());
             int numberOfServices = Integer.parseInt(reader.readLine());
             int numberOfMinutes = Integer.parseInt(reader.readLine());
