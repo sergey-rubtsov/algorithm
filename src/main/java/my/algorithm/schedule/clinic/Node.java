@@ -38,19 +38,12 @@ public class Node {
         return children;
     }
 
-    public void setChildren(List<Node> children) {
-        this.children = children;
-    }
-
     public Service getService() {
         return service;
     }
 
-    public void setService(Service service) {
-        this.service = service;
-    }
-
     public void addChild(Node child) {
+        child.setDepth(getDepth() + 1);
         children.add(child);
     }
 
@@ -63,11 +56,14 @@ public class Node {
     }
 
     public boolean hasThisAncestorType(int type, int length) {
+        if (this.getService().getId() == type) {
+            return true;
+        }
         Node ancestor = parent;
         if (null == ancestor) {
             return false;
         }
-        for (int i = 0; i < length; i++) {
+/*        for (int i = 0; i < length - 1; i++) {
             if (null == ancestor) {
                 return false;
             }
@@ -76,11 +72,25 @@ public class Node {
             } else {
                 ancestor = parent.getParent();
             }
-        }
+        }*/
         return false;
     }
 
     public boolean endsBefore(Node next) {
-        return this.service.getEndTime() >= next.getService().getStartTime();
+        return this.service.getEndTime() <= next.getService().getStartTime();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("{");
+        if (null != parent) {
+            Service parentService = parent.getService();
+            if (null != parentService) {
+                sb.append("parent=").append(parentService).append(", ");
+            }
+        }
+        sb.append("service=").append(service);
+        sb.append('}');
+        return sb.toString();
     }
 }

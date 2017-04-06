@@ -46,6 +46,7 @@ public class Process {
             leftover.addAll(first);
             step(begin, leftover);
         }
+        System.out.print(forest.size());
     }
 
     private void step(Service begin, Deque<Service> following) {
