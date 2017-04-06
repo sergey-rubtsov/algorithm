@@ -61,4 +61,26 @@ public class Node {
     public void setDepth(int depth) {
         this.depth = depth;
     }
+
+    public boolean hasThisAncestorType(int type, int length) {
+        Node ancestor = parent;
+        if (null == ancestor) {
+            return false;
+        }
+        for (int i = 0; i < length; i++) {
+            if (null == ancestor) {
+                return false;
+            }
+            if (ancestor.getService().getId() == type) {
+                return true;
+            } else {
+                ancestor = parent.getParent();
+            }
+        }
+        return false;
+    }
+
+    public boolean endsBefore(Node next) {
+        return this.service.getEndTime() >= next.getService().getStartTime();
+    }
 }

@@ -18,10 +18,19 @@ public class Branch {
     }
 
     public void tryToExtend(Service nextService) {
+        Node parent = begin;
         Node next = new Node(nextService);
-        for (Node child : begin.getChildren()) {
-            int type = next.getService().getId();
+        recursiveScan(parent, next);
+    }
 
+    private void recursiveScan(Node parent, Node next) {
+        int type = next.getService().getId();
+        for (Node child : parent.getChildren()) {
+            recursiveScan(child, next);
+        }
+        if (parent.endsBefore(next) && !parent.hasThisAncestorType(type, requestedServices.length)) {
+            next.setParent(parent);
+            parent.addChild(next);
         }
     }
 
