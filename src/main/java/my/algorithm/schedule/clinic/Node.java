@@ -14,6 +14,8 @@ public class Node {
 
     private int depth;
 
+    private boolean found = true;
+
     private List<Node> children = new ArrayList<>();
 
     public Node(Service service, int depth) {
@@ -56,23 +58,20 @@ public class Node {
     }
 
     public boolean hasThisAncestorType(int type, int length) {
-        if (this.getService().getId() == type) {
-            return true;
-        }
-        Node ancestor = parent;
-        if (null == ancestor) {
-            return false;
-        }
-/*        for (int i = 0; i < length - 1; i++) {
-            if (null == ancestor) {
-                return false;
-            }
-            if (ancestor.getService().getId() == type) {
+        Node ancestor = this;
+        for (int i = 0; i < length; i++) {
+            if (ancestor.typeIs(type)) {
+                found = false;
                 return true;
             } else {
-                ancestor = parent.getParent();
+                if (ancestor.hasParent()) {
+                    ancestor = ancestor.getParent();
+                } else {
+                    found = false;
+                    return false;
+                }
             }
-        }*/
+        }
         return false;
     }
 
@@ -92,5 +91,55 @@ public class Node {
         sb.append("service=").append(service);
         sb.append('}');
         return sb.toString();
+    }
+
+    public String printServices(int length) {
+        final StringBuilder sb = new StringBuilder();
+        List<Node> reversed = new ArrayList<>();
+        Node ancestor = this;
+        reversed.add(ancestor);
+        for (int i = 0; ((i < length - 1) && ancestor.hasParent()); i++) {
+            ancestor = ancestor.getParent();
+            reversed.add(ancestor);
+
+        }
+        appendService(sb, reversed.get(reversed.size() - 1));
+        for (int i = reversed.size() - 1; i > 0; i--) {
+            sb.append('\n');
+            appendService(sb, reversed.get(i - 1));
+        }
+        return sb.toString();
+    }
+
+    private void appendService(StringBuilder sb, Node node) {
+        sb.append(node.getService().getId()).append(" ")
+                .append(node.getService().getDoctor()).append(" ")
+                .append(node.getService().getStartTime());
+    }
+
+    public boolean isFound() {
+        return found;
+    }
+
+    public void setFound(boolean found) {
+        this.found = found;
+    }
+
+    public boolean hasParent() {
+        return getParent() != null;
+    }
+
+    public boolean typeIs(int type) {
+        return getService().getId() == type;
+    }
+
+    public int calculateTime(int length) {
+        Node ancestor = this;
+        int end = ancestor.getService().getEndTime();
+        for (int i = 0; ((i < length - 1) && ancestor.hasParent()); i++) {
+            ancestor = ancestor.getParent();
+        }
+        int start = ancestor.getService().getStartTime();
+        return end - start;
     }
 }

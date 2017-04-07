@@ -35,7 +35,7 @@ public class Process {
         return result;
     }
 
-    public void start(List<Service> services) {
+    public String process(List<Service> services) {
         services = filterByServiceId(requestedServices, services);
         Collections.sort(services);
         Deque<Service> first = new ArrayDeque<>();
@@ -46,7 +46,23 @@ public class Process {
             leftover.addAll(first);
             step(begin, leftover);
         }
-        System.out.print(forest.size());
+        List<Node> found = new ArrayList<>();
+        for (Branch branch : forest) {
+            found.addAll(branch.getFound());
+        }
+        Node optimal = findOptimal(found);
+        return optimal.printServices(requestedServices.length);
+    }
+
+    private Node findOptimal(List<Node> found) {
+        Node result = found.get(0);
+        int time = result.calculateTime(requestedServices.length);
+        for (Node node : found) {
+            if (node.calculateTime(requestedServices.length) < time) {
+                result = node;
+            }
+        }
+        return result;
     }
 
     private void step(Service begin, Deque<Service> following) {
