@@ -15,10 +15,29 @@ public class Process {
 
     private int[] requestedServices;
 
+    private int idealTime;
+
+    private int maxTime;
+
+    private static float factor = 1.6f;
+
     List<Branch> forest = new ArrayList<>();
 
-    public Process(int[] requestedServices) {
-        this.requestedServices = requestedServices;
+    public Process(RawData data) {
+        this.requestedServices = data.getRequestedServices();
+        this.maxTime = data.getNumberOfMinutes();
+        this.idealTime = calculateIdealTime(data.getRequestedServices(), data.getServiceDuration());
+    }
+
+    private int calculateIdealTime(int[] requestedServices, int[] serviceDuration) {
+        if (serviceDuration.length < requestedServices.length) {
+            throw new RuntimeException();
+        }
+        int result = 0;
+        for (int service : requestedServices) {
+            result = result + serviceDuration[service];
+        }
+        return result;
     }
 
     private List<Service> filterByServiceId(int[] requestedServices, List<Service> services) {
@@ -69,7 +88,9 @@ public class Process {
         Branch branch = new Branch(begin, requestedServices);
         while (!following.isEmpty()) {
             Service next = following.pop();
-            branch.tryToExtend(next);
+            for (int i = idealTime; i < maxTime; i = i + Math.round(idealTime * factor)) {
+                branch.tryToExtend(next, idealTime);
+            }
         }
         forest.add(branch);
     }

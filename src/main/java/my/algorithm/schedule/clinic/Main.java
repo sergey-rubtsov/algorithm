@@ -11,14 +11,8 @@ public class Main {
         Feeder feeder = new Feeder();
         RawData data = feeder.readFile("input0.txt");
         List<Service> services = data.getServices();
-        Process process = new Process(data.getRequestedServices());
+        Process process = new Process(data);
         System.out.println(process.process(services));
-/*        for (Node found : process.getFound()) {
-            for (int i = 0; i < data.getNumberOfServices(); i++) {
-                System.out.print(found.getService().getId() + " " + found.getService().getStartTime()+ " " + found.getService().getEndTime() + ";");
-            }
-            System.out.println("");
-        }*/
     }
 
 }

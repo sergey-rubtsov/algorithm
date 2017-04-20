@@ -20,13 +20,16 @@ public class Branch {
         this.requestedServices = requestedServices;
     }
 
-    public void tryToExtend(Service nextService) {
+    public void tryToExtend(Service nextService, int idealTime) {
         Node parent = begin;
         Node next = new Node(nextService);
         recursiveScan(parent, next);
     }
 
     private void recursiveScan(Node parent, Node next) {
+        if (parent.getDepth() >= requestedServices.length) {
+            return;
+        }
         int type = next.getService().getId();
         if (parent.endsBefore(next) && !parent.hasThisAncestorType(type, requestedServices.length)) {
             next = new Node(next.getService());
