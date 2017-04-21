@@ -1,6 +1,6 @@
 package my.algorithm.schedule;
 
-public class TestClass {
+public class RadioTowers {
 
     public static class StackArray {
         private int top;
@@ -78,7 +78,7 @@ public class TestClass {
                 range[j] = scanner.nextInt();
             }*/
             int[] range = {100, 80, 60, 70, 60, 75, 85};
-            new TestClass().process(7, range);
+            new RadioTowers().process(7, range);
             System.out.println("");
 /*        }*/
     }
