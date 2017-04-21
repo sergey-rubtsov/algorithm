@@ -15,10 +15,29 @@ public class Process {
 
     private int[] requestedServices;
 
+    private int idealTime;
+
+    private int maxTime;
+
+    private static float factor = 1.6f;
+
     List<Branch> forest = new ArrayList<>();
 
-    public Process(int[] requestedServices) {
-        this.requestedServices = requestedServices;
+    public Process(RawData data) {
+        this.requestedServices = data.getRequestedServices();
+        this.maxTime = data.getNumberOfMinutes();
+        this.idealTime = calculateIdealTime(data.getRequestedServices(), data.getServiceDuration());
+    }
+
+    private int calculateIdealTime(int[] requestedServices, int[] serviceDuration) {
+        if (serviceDuration.length < requestedServices.length) {
+            throw new RuntimeException();
+        }
+        int result = 0;
+        for (int service : requestedServices) {
+            result = result + serviceDuration[service];
+        }
+        return result;
     }
 
     private List<Service> filterByServiceId(int[] requestedServices, List<Service> services) {
@@ -35,7 +54,7 @@ public class Process {
         return result;
     }
 
-    public void start(List<Service> services) {
+    public String process(List<Service> services) {
         services = filterByServiceId(requestedServices, services);
         Collections.sort(services);
         Deque<Service> first = new ArrayDeque<>();
@@ -46,13 +65,32 @@ public class Process {
             leftover.addAll(first);
             step(begin, leftover);
         }
+        List<Node> found = new ArrayList<>();
+        for (Branch branch : forest) {
+            found.addAll(branch.getFound());
+        }
+        Node optimal = findOptimal(found);
+        return optimal.printServices(requestedServices.length);
+    }
+
+    private Node findOptimal(List<Node> found) {
+        Node result = found.get(0);
+        int time = result.calculateTime(requestedServices.length);
+        for (Node node : found) {
+            if (node.calculateTime(requestedServices.length) < time) {
+                result = node;
+            }
+        }
+        return result;
     }
 
     private void step(Service begin, Deque<Service> following) {
         Branch branch = new Branch(begin, requestedServices);
         while (!following.isEmpty()) {
             Service next = following.pop();
-            branch.tryToExtend(next);
+            for (int i = idealTime; i < maxTime; i = i + Math.round(idealTime * factor)) {
+                branch.tryToExtend(next, idealTime);
+            }
         }
         forest.add(branch);
     }

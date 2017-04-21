@@ -12,58 +12,43 @@ public class Branch {
 
     private Node begin;
 
+    private List<Node> index = new ArrayList<>();
+
     public Branch(Service begin, int[] requestedServices) {
         this.begin = new Node(begin, 0);
+        this.begin.setFound(false);
         this.requestedServices = requestedServices;
     }
 
-    public void tryToExtend(Service nextService) {
+    public void tryToExtend(Service nextService, int idealTime) {
+        Node parent = begin;
         Node next = new Node(nextService);
-        for (Node child : begin.getChildren()) {
-            int type = next.getService().getId();
+        recursiveScan(parent, next);
+    }
 
+    private void recursiveScan(Node parent, Node next) {
+        if (parent.getDepth() >= requestedServices.length) {
+            return;
+        }
+        int type = next.getService().getId();
+        if (parent.endsBefore(next) && !parent.hasThisAncestorType(type, requestedServices.length)) {
+            next = new Node(next.getService());
+            next.setParent(parent);
+            parent.addChild(next);
+            index.add(next);
+        }
+        for (Node child : parent.getChildren()) {
+            recursiveScan(child, next);
         }
     }
 
-    private List<Node> tryToAddNode(Node node, List<Node> nodes) {
-        List<Node> newNodes = new ArrayList<>();
-        for (Node next : nodes) {
-            if (checkPedigree(node, next)) {
-                next.setParent(node);
-                node.addChild(next);
-                newNodes.add(next);
+    public List<Node> getFound() {
+        List<Node> found = new ArrayList<>();
+        for (Node node : index) {
+            if (node.isFound() && node.getDepth() >= requestedServices.length - 1) {
+                found.add(node);
             }
         }
-        return newNodes;
-    }
-
-    private boolean checkParents(Node node, int serviceId, int depth) {
-        for (int i = 0; i < depth; i++) {
-            if (null == node.getParent()) {
-                return true;
-            } else {
-                node = node.getParent();
-                if (null == node.getParent()) {
-                    return true;
-                } else if (node.getService().getId() == serviceId) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private boolean checkPedigree(Node parent, Node child) {
-        for (int i = 0; i < requestedServices.length + 1; i++) {
-            if (parent == null) {
-                return true;
-            }
-            if (parent.getService().getId() == child.getService().getId()) {
-                return false;
-            } else {
-                parent = parent.getParent();
-            }
-        }
-        return true;
+        return found;
     }
 }

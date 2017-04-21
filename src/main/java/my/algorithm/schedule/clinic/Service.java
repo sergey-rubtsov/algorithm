@@ -2,8 +2,6 @@ package my.algorithm.schedule.clinic;
 
 public class Service implements Comparable<Service> {
 
-	private final int doctorId;
-
 	private final int id;
 
 	private final int startTime;
@@ -11,6 +9,8 @@ public class Service implements Comparable<Service> {
 	private final int endTime;
 
 	private final int duration;
+
+	private final int doctorId;
 
 	public Service(int doctorId, int id, int startTime, int duration) {
 		this.doctorId = doctorId;
@@ -72,5 +72,17 @@ public class Service implements Comparable<Service> {
 		result = 31 * result + endTime;
 		result = 31 * result + duration;
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder("{");
+		sb.append(id);
+		sb.append(",").append(startTime);
+		sb.append(",").append(endTime);
+		sb.append(",").append(duration);
+		sb.append(",").append(doctorId);
+		sb.append('}');
+		return sb.toString();
 	}
 }
