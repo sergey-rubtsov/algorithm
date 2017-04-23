@@ -1,4 +1,4 @@
-package my.algorithm.schedule;
+package my.algorithm.simple;
 
 public class StackArray {
 

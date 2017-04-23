@@ -1,4 +1,4 @@
-package my.algorithm.schedule;
+package my.algorithm.simple;
 
 import java.util.*;
 

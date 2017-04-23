@@ -1,4 +1,4 @@
-package my.algorithm.schedule;
+package my.algorithm.simple;
 
 /**
  * Created by Serg on 21.04.2017.
