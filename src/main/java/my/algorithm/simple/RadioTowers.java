@@ -77,7 +77,7 @@ public class RadioTowers {
             for (int j = 0; j < count; j++) {
                 range[j] = scanner.nextInt();
             }*/
-            int[] range = {100, 80, 60, 70, 60, 75, 85};
+            int[] range = {3, 2, 5, 3, 3, 4, 1, 2};
             new RadioTowers().process(7, range);
             System.out.println("");
 /*        }*/
